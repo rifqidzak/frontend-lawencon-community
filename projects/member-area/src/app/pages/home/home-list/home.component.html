@@ -1,0 +1,1238 @@
+<div class="w-full body-color">
+  <div class=" flex justify-content-center flex-wrap">
+    <div class="grid w-full lg:w-10 container">
+      <div class="md:col-4 md:block hidden">
+        <div class=" flex align-items-center mb-4 mt-5">
+          <div class="border-circle bg-blue-600 icon-box flex align-items-center justify-content-center">
+            <i class="fa-regular fa-file-lines icon text-2xl"></i>
+          </div>
+          <h2 class=" ml-3">
+            Recent Articles
+          </h2>
+        </div>
+        <p-card>
+          <ng-container *ngFor="let ra of recentArticle;index as i">
+            <div class="py-5 border-bottom-1 border-black-alpha-50 border-round-left-md">
+              <p-image *ngIf="recentArticle[i].file.files" [preview]="true"
+                src="{{urlFile}}{{ recentArticle[i].file.id }}" alt="article image" class="img-fluid"></p-image>
+              <p-image *ngIf="!recentArticle[i].file.files" [preview]="true" src="../../../../assets/images/article.jpg"
+                alt="article image" class="img-fluid"></p-image>
+
+              <h3 class="mt-3">
+                {{ recentArticle[i].title }}
+              </h3>
+              <div class="mt-3 text-justify text-black-alpha-60">
+                <p class="surface-overlay overflow-hidden h-details w-full">
+                  {{
+                  recentArticle[i].contents
+                  }}
+                </p>
+                <p *ngIf="recentArticle[i].contents.length > 130">
+                  . . .
+                </p>
+              </div>
+              <div class="text-right mt-3 flex justify-content-between">
+                <p class="text-black-alpha-60">
+                  {{ recentArticle[i].createdAt | timeAgo }}
+                </p>
+                <div routerLink="/articles/members/details/{{recentArticle[i].id}}"
+                  class=" cursor-pointer font-medium text-black-alpha-60 hover:underline hover:text-black-alpha-50">
+                  <p>Show details</p>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </p-card>
+      </div>
+      <div class="col-12 md:col-8 mt-3">
+        <p-card>
+          <div class="flex sm:mx-5">
+            <div class="max-w-max">
+              <div class="w-3rem h-3rem border-circle overflow-hidden">
+                <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile"></div>
+                <ng-template #isProfile>
+                  <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                    imageClass="w-3rem h-3rem"></p-image>
+                </ng-template>
+                <ng-template #isNotProfile>
+                  <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                    imageClass="w-3rem h-3rem"></p-image>
+                </ng-template>
+              </div>
+
+            </div>
+            <div (click)="postDialog('regular')"
+              class="w-full bg-black-alpha-10 ml-2 sm:ml-5 border-round-3xl flex align-items-center px-4 cursor-pointer hover:text-black-alpha-60 hover:bg-gray-300 transition-all transition-duration-200">
+              <p class="text-black-alpha-50">What do you think?</p>
+            </div>
+          </div>
+          <div class="flex sm:mx-3">
+            <div
+              class=" flex align-items-center mt-3 mr-3 cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2"
+              routerLink="/homes/threads/new">
+              <div class="border-circle bg-purple-500 icon-box flex align-items-center justify-content-center">
+                <i class="fa-solid fa-check-to-slot icon text-2xl"></i>
+              </div>
+              <h3 class="hidden sm:block ml-3">
+                Poll Post
+              </h3>
+            </div>
+            <div *ngIf="myStatusSubscribe"
+              class=" flex align-items-center mt-3 cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2"
+              (click)="postDialog('premium')">
+              <div class="border-circle bg-orange-400 icon-box flex align-items-center justify-content-center">
+                <i class="fa-regular fa-gem icon text-2xl"></i>
+              </div>
+              <h3 class="hidden sm:block ml-3">
+                Premium Post
+              </h3>
+            </div>
+          </div>
+        </p-card>
+        <div class="pt-3">
+
+          <ng-container *ngIf="type == 'threads'">
+            <p-card infinite-scroll (scrolled)="onScroll()">
+              <p-tabMenu [model]="items" [activeItem]="items[0]"></p-tabMenu>
+
+              <ng-container *ngFor="let p of post; index as i">
+                <div class="md:mx-5 h-max">
+
+                  <div class="flex align-items-center mb-3 mt-7 relative z-1">
+                    <div class="max-w-max mr-3">
+                      <div class="w-3rem h-3rem border-circle overflow-hidden">
+                        <p-image [preview]="true" *ngIf="post[i].user.file" src="{{urlFile}}{{post[i].user.file.id}}"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                        <p-image [preview]="true" *ngIf="!post[i].user.file" src="../../../../assets/logos/user.jpg"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                      </div>
+                    </div>
+                    <div class="w-full">
+                      <h3>{{ post[i].user.fullName }}</h3>
+                      <p class="text-black-alpha-60 text-xs mt-1">
+                        {{ post[i].createdAt | timeAgo }} </p>
+                    </div>
+                    <div *ngIf="post[i].user.company"
+                      class="hidden sm:block min-w-max mr-3 bg-green-100 border-round-xl">
+                      <h4 class="mx-3 my-1 text-green-500">{{ post[i].user.company }}</h4>
+                    </div>
+
+                    <div *ngIf="post[i].postType.postTypeName == 'Premium'"
+                      class="border-circle bg-orange-400 px-2 icon-box flex align-items-center justify-content-center">
+                      <i class="fa-regular fa-gem icon text-2xl"></i>
+                    </div>
+
+                    <div
+                      *ngIf="(post[i].postType.postTypeName != 'Premium') || (post[i].postType.postTypeName == 'Premium' && myStatusSubscribe)"
+                      class="relative">
+                      <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100" pStyleClass="@next"
+                        enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true">
+                        <div
+                          class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <i class="fa-solid fa-ellipsis text-xl"></i>
+                        </div>
+                      </div>
+                      <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden">
+                        <ul class="list-none p-0 m-0">
+                          <li>
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              routerLink="/homes/details/{{post[i].id}}">
+                              show detail
+                            </a>
+                          </li>
+                          <li *ngIf="myId == post[i].user.id">
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="postEditDialog(post[i].id, i)">
+                              edit post
+                            </a>
+                          </li>
+                          <li *ngIf="myId == post[i].user.id">
+                            <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="showPopUpDelete(post[i].id, i)">
+                              delete post
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="relative">
+                    <div *ngIf="post[i].postType.postTypeName == 'Premium' && !myStatusSubscribe"
+                      pTooltip="disabled, premium first" class="cursor-pointer absolute w-full h-full bg-black-alpha-20 blur hover:bg-black-alpha-30
+                      flex justify-content-center align-items-center z-2">
+                      <div class="text-center text-white">
+                        <i class="fa-solid fa-lock text-5xl"></i>
+                        <h2 class="mt-2">Locked</h2>
+                        <h2 class="text-white text-center w-full">Premium Only</h2>
+                      </div>
+                    </div>
+
+                    <p-card styleClass="content-box">
+                      <h3 class="text-justify">{{post[i].title}}
+                      </h3>
+                      <p class="text-black-alpha-60 mt-3 text-justify">
+                        {{post[i].contents }}
+                      </p>
+                    </p-card>
+
+                    <div *ngIf="post[i].fileId" class="flex w-full column-gap-1 cursor-pointer">
+                      <ng-container *ngFor="let pa of post[i].fileId;index as j">
+                        <ng-container *ngIf="post[i].fileId.length == 1">
+                          <img (click)="imageClick(i, j)" src="{{urlFile}}{{ post[i].fileId[j] }}" alt="post image">
+                        </ng-container>
+                        <ng-container *ngIf="post[i].fileId.length == 2">
+                          <div
+                            class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem bg-black-alpha-30 overflow-hidden">
+                            <img (click)="imageClick(i, j)" src="{{urlFile}}{{ post[i].fileId[j] }}" alt="post image"
+                              class="w-auto">
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="post[i].fileId.length > 2">
+                          <ng-container *ngIf="j == 0">
+                            <div
+                              class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem  overflow-hidden pb-1">
+                              <img (click)="imageClick(i, j)" src="{{urlFile}}{{ post[i].fileId[j] }}" alt="post image"
+                                class="w-auto">
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+
+                      <ng-container *ngIf="post[i].fileId.length > 2">
+                        <div class="flex w-6 flex-wrap">
+                          <ng-container *ngFor="let pa of post[i].fileId;index as j">
+                            <ng-container *ngIf="j == 1">
+                              <div
+                                class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                <img (click)="imageClick(i, j)" src="{{urlFile}}{{ post[i].fileId[j] }}"
+                                  alt="post image" class="h-auto">
+                              </div>
+                            </ng-container>
+                            <ng-container *ngIf="post[i].fileId.length == 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                  <img (click)="imageClick(i, j)" src="{{urlFile}}{{ post[i].fileId[j] }}"
+                                    alt="post image" class="h-auto">
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="post[i].fileId.length > 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1 relative">
+                                  <img src="{{urlFile}}{{ post[i].fileId[j] }}" alt="post image" class="h-auto">
+                                  <div (click)="imageClick(i, j)"
+                                    class="absolute w-full h-10rem sm:h-15rem bg-black-alpha-90 opacity-70 flex justify-content-center align-items-center img-cover">
+                                    <h1 class="text-white">
+                                      {{post[i].fileId.length -3}} +</h1>
+                                  </div>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </div>
+
+                    <p-card *ngIf="p.titlePoll" styleClass="pooling-content">
+                      <h3 class="text-justify">{{p.titlePoll}}</h3>
+
+                      <ng-container *ngFor="let po of post[i].pollContents; index as j">
+
+                        <div *ngIf="!p.choosenPolling" class="mt-3 body-color hover:bg-gray-100">
+                          <div class="flex align-items-center cursor-pointer py-3"
+                            (click)="choosePollOption(p.pollId[j], i , j)">
+                            <p class="text-center text-lg main-text w-full">{{po}}</p>
+                          </div>
+                        </div>
+
+
+                        <ng-container *ngIf="p.choosenPolling">
+                          <div *ngIf="p.pollId[j] != p.choosenPolling" class="mt-3 py-3 body-color cursor-pointer"
+                            pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg main-text w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 text-black-alpha-60">{{p.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+
+                          <div *ngIf="p.pollId[j] == p.choosenPolling"
+                            class="mt-3 py-3 main-color text-white cursor-pointer" pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg  w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 ">{{p.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                      <div class="flex mt-5 align-items-center text-black-alpha-60">
+                        <i class="fa-solid fa-check-to-slot text-2xl mr-2 cursor-pointer"></i>
+                        <p class="w-full">{{p.totalVote}} votes</p>
+                      </div>
+
+                    </p-card>
+
+                    <div class="flex flex-wrap mt-5 align-items-center text-black-alpha-60 ">
+                      <div class="flex align-items-center">
+                        <div
+                          class="flex-order-0 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2"
+                          (click)="actLikePost(p.id,p.likeId,i)">
+
+                          <i *ngIf="!p.likeId || !p.statusLike" class="fa-regular fa-heart text-2xl mr-2"></i>
+                          <i *ngIf="p.likeId && p.statusLike" class="fa-solid fa-heart text-red-500 text-2xl mr-2"></i>
+
+
+                          <p class="min-w-max">{{ p.countOfLike }} <span class="hidden sm:inline">likes</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex-order-2 flex align-items-center cursor-pointer flex-grow-1 justify-content-end"
+                        (click)="actBookmark(p.id,p.bookmarkId,i)">
+                        <div
+                          class="hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <div *ngIf="!p.bookmarkId || !p.statusBookmark; then isntBookmark else isBookmark">
+                          </div>
+                          <ng-template #isntBookmark>
+                            <i class="fa-regular fa-bookmark text-2xl mr-2"></i>
+                          </ng-template>
+                          <ng-template #isBookmark>
+                            <i class="fa-solid fa-bookmark text-2xl mr-2 main-text"></i>
+                          </ng-template>
+                        </div>
+                      </div>
+
+                      <div pStyleClass="@next" enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true"
+                        enterActiveClass="scalein" leaveActiveClass="fadeout"
+                        class="flex-order-1 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                        <div class="ml-1 flex align-items-center">
+                          <i class="fa-regular fa-message text-2xl mr-2"></i>
+                          <p class="">{{ p.countOfComment }} <span class="hidden sm:inline">comments</span></p>
+                        </div>
+                      </div>
+
+                      <div class="flex-order-3 w-full mt-2 hidden">
+                        <ng-container *ngFor="let us of p.userComment;index as j">
+                          <div *ngIf="j != indexComment" class="flex mt-3 justify-content-between">
+                            <div class="flex">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="card-word-flex">
+                                <div class="bg-gray-100 px-3 py-2 border-round-xl">
+                                  <p class="font-medium">{{ us.fullName }}</p>
+                                  <p class=" text-black-alpha-60">{{ p.commentBody[j] }} </p>
+                                </div>
+                                <p class="text-black-alpha-60 text-xs mt-1 ml-3">
+                                  {{ p.createdAtComment[j] | timeAgo }} </p>
+                              </div>
+                            </div>
+                            <div *ngIf="myId == p.userComment[j].id || myId == p.createdBy">
+                              <div class="relative">
+                                <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100"
+                                  pStyleClass="@next" enterClass="hidden" leaveToClass="hidden"
+                                  [hideOnOutsideClick]="true">
+                                  <div
+                                    class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                                    <i class="fa-solid fa-ellipsis text-xl"></i>
+                                  </div>
+                                </div>
+                                <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden z-2">
+                                  <ul class="list-none p-0 m-0">
+                                    <li *ngIf="myId == p.userComment[j].id">
+                                      <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showEditComment(p.commentId[j], i, j)">
+                                        edit comment
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showPopUpDeleteComment(p.commentId[j], i, j)">
+                                        delete comment
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div *ngIf="j == indexComment">
+                            <div class="flex mt-3">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="w-full">
+                                <form [formGroup]="updateCommentForm" class="card w-full">
+                                  <div class="field">
+                                    <input formControlName="commentBody" pInputText
+                                      class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text">
+                                    <p class="text-xs text-black-alpha-60">Press Enter to Save Edit.
+                                    </p>
+                                  </div>
+                                  <div class="hidden">
+                                    <button [disabled]="updateCommentForm.invalid" type="submit"
+                                      (click)="updateComment(p.id, p.commentId[j], j, i)"></button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                        <div routerLink="/homes/details/{{p.id}}"
+                          class="mt-2 cursor-pointer w-full text-right font-medium text-black-alpha-60 hover:underline hover:text-black-alpha-50">
+                          <p>Show all comments</p>
+                        </div>
+
+                        <div class="flex mt-3">
+                          <div class="max-w-max mr-3">
+                            <div class="w-2rem h-2rem border-circle overflow-hidden">
+                              <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile">
+                              </div>
+                              <ng-template #isProfile>
+                                <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                              <ng-template #isNotProfile>
+                                <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <div class="w-full">
+                            <form [formGroup]="commentForm" class="card w-full">
+                              <div class="field">
+                                <input formControlName="commentBody" pInputText
+                                  class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text"
+                                  placeholder="write comment...">
+                                <p class="text-xs text-black-alpha-60">Press Enter to Send.
+                                </p>
+                              </div>
+                              <div class="hidden">
+                                <button [disabled]="commentForm.invalid" type="submit"
+                                  (click)="insertComment(p.id, i)"></button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </p-card>
+
+          </ng-container>
+
+          <ng-container *ngIf="type == 'likes'">
+            <p-card infinite-scroll (scrolled)="onScrollLike()">
+              <p-tabMenu [model]="items" [activeItem]="items[0]"></p-tabMenu>
+
+              <ng-container *ngFor="let p of postLike; index as i">
+                <div class="md:mx-5 h-max">
+                  <div class="flex align-items-center mb-3 mt-7 relative z-1">
+                    <div class="max-w-max mr-3">
+                      <div class="w-3rem h-3rem border-circle overflow-hidden">
+                        <p-image [preview]="true" *ngIf="p.post.user.file" src="{{urlFile}}{{p.post.user.file.id}}"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                        <p-image [preview]="true" *ngIf="!p.post.user.file" src="../../../../assets/logos/user.jpg"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                      </div>
+                    </div>
+                    <div class="w-full">
+                      <h3>{{ p.post.user.fullName }}</h3>
+                      <p class="text-black-alpha-60 text-xs mt-1">
+                        {{ p.post.createdAt | timeAgo }} </p>
+                    </div>
+                    <div *ngIf="p.post.user.company"
+                      class="hidden sm:block min-w-max mr-3 bg-green-100 border-round-xl">
+                      <h4 class="mx-3 my-1 text-green-500">{{ p.post.user.company }}</h4>
+                    </div>
+
+                    <div *ngIf="p.post.postType.postTypeName == 'Premium'"
+                      class="border-circle bg-orange-400 px-2 icon-box flex align-items-center justify-content-center">
+                      <i class="fa-regular fa-gem icon text-2xl"></i>
+                    </div>
+
+                    <div
+                      *ngIf="(p.post.postType.postTypeName != 'Premium') || (p.post.postType.postTypeName == 'Premium' && myStatusSubscribe)"
+                      class="relative">
+                      <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100" pStyleClass="@next"
+                        enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true">
+                        <div
+                          class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <i class="fa-solid fa-ellipsis text-xl"></i>
+                        </div>
+                      </div>
+                      <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden">
+                        <ul class="list-none p-0 m-0">
+                          <li>
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              routerLink="/homes/details/{{p.post.id}}">
+                              show detail
+                            </a>
+                          </li>
+                          <li *ngIf="myId == p.post.user.id">
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="postEditDialog(p.post.id, i)">
+                              edit post
+                            </a>
+                          </li>
+                          <li *ngIf="myId == p.post.user.id">
+                            <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="showPopUpDelete(p.post.id, i)">
+                              delete post
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="relative">
+                    <div *ngIf="p.post.postType.postTypeName == 'Premium' && !myStatusSubscribe"
+                      pTooltip="disabled, premium first" class="cursor-pointer absolute w-full h-full bg-black-alpha-20 blur hover:bg-black-alpha-30
+                      flex justify-content-center align-items-center">
+                      <div class="text-center text-white">
+                        <i class="fa-solid fa-lock text-5xl"></i>
+                        <h2 class="mt-2">Locked</h2>
+                        <h2 class="text-white text-center w-full">Premium Only</h2>
+                      </div>
+                    </div>
+
+                    <p-card styleClass="content-box">
+                      <h3 class="text-justify">{{p.post.title}}
+                      </h3>
+                      <p class="text-black-alpha-60 mt-3 text-justify">
+                        {{p.post.contents }}
+                      </p>
+                    </p-card>
+
+                    <div *ngIf="p.post.fileId" class="flex w-full column-gap-1 cursor-pointer">
+                      <ng-container *ngFor="let pa of p.post.fileId;index as j">
+                        <ng-container *ngIf="p.post.fileId.length == 1">
+                          <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image">
+                        </ng-container>
+                        <ng-container *ngIf="p.post.fileId.length == 2">
+                          <div
+                            class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem bg-black-alpha-30 overflow-hidden">
+                            <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                              class="w-auto">
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="p.post.fileId.length > 2">
+                          <ng-container *ngIf="j == 0">
+                            <div
+                              class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem  overflow-hidden pb-1">
+                              <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                                class="w-auto">
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+
+                      <ng-container *ngIf="p.post.fileId.length > 2">
+                        <div class="flex w-6 flex-wrap">
+                          <ng-container *ngFor="let pa of p.post.fileId;index as j">
+                            <ng-container *ngIf="j == 1">
+                              <div
+                                class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                                  class="h-auto">
+                              </div>
+                            </ng-container>
+                            <ng-container *ngIf="p.post.fileId.length == 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                  <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}"
+                                    alt="post image" class="h-auto">
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="p.post.fileId.length > 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1 relative">
+                                  <img src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image" class="h-auto">
+                                  <div (click)="imageClick(i, j)"
+                                    class="absolute w-full h-10rem sm:h-15rem bg-black-alpha-90 opacity-70 flex justify-content-center align-items-center img-cover">
+                                    <h1 class="text-white">
+                                      {{p.post.fileId.length -3}} +</h1>
+                                  </div>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </div>
+
+                    <p-card *ngIf="p.post.titlePoll" styleClass="pooling-content">
+                      <h3 class="text-justify">{{p.post.titlePoll}}</h3>
+
+                      <ng-container *ngFor="let po of p.post.pollContents; index as j">
+
+                        <div *ngIf="!p.post.choosenPolling" class="mt-3 body-color hover:bg-gray-100">
+                          <div class="flex align-items-center cursor-pointer py-3"
+                            (click)="choosePollOption(p.post.pollId[j], i , j)">
+                            <p class="text-center text-lg main-text w-full">{{po}}</p>
+                          </div>
+                        </div>
+
+
+                        <ng-container *ngIf="p.post.choosenPolling">
+                          <div *ngIf="p.post.pollId[j] != p.post.choosenPolling"
+                            class="mt-3 py-3 body-color cursor-pointer" pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg main-text w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 text-black-alpha-60">{{p.post.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+
+                          <div *ngIf="p.post.pollId[j] == p.post.choosenPolling"
+                            class="mt-3 py-3 main-color text-white cursor-pointer" pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg  w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 ">{{p.post.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                      <div class="flex mt-5 align-items-center text-black-alpha-60">
+                        <i class="fa-solid fa-check-to-slot text-2xl mr-2 cursor-pointer"></i>
+                        <p class="w-full">{{p.post.totalVote}} votes</p>
+                      </div>
+
+                    </p-card>
+
+                    <div class="flex flex-wrap mt-5 align-items-center text-black-alpha-60 ">
+                      <div class="flex align-items-center">
+                        <div
+                          class="flex-order-0 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2"
+                          (click)="actLikePostLike(p.post.likeId,i)">
+                          <i class="fa-solid fa-heart text-red-500 text-2xl mr-2"></i>
+                          <p class="min-w-max">{{ p.post.countOfLike }} <span class="hidden sm:inline">likes</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- <div class="flex-order-2 flex align-items-center cursor-pointer flex-grow-1 justify-content-end"
+                        (click)="actBookmark(p.post.id,p.post.bookmarkId,i)">
+                        <div
+                          class="hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <div *ngIf="!p.post.bookmarkId || !p.post.statusBookmark; then isntBookmark else isBookmark">
+                          </div>
+                          <ng-template #isntBookmark>
+                            <i class="fa-regular fa-bookmark text-2xl mr-2"></i>
+                          </ng-template>
+                          <ng-template #isBookmark>
+                            <i class="fa-solid fa-bookmark text-2xl mr-2 main-text"></i>
+                          </ng-template>
+                        </div>
+                      </div> -->
+
+                      <div pStyleClass="@next" enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true"
+                        enterActiveClass="scalein" leaveActiveClass="fadeout"
+                        class="flex-order-1 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                        <div class="ml-1 flex align-items-center">
+                          <i class="fa-regular fa-message text-2xl mr-2"></i>
+                          <p class="">{{ p.post.countOfComment }} <span class="hidden sm:inline">comments</span></p>
+                        </div>
+                      </div>
+
+                      <div class="flex-order-3 w-full mt-2 hidden">
+                        <ng-container *ngFor="let us of p.post.userComment;index as j">
+                          <div *ngIf="j != indexComment" class="flex mt-3 justify-content-between">
+                            <div class="flex">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="card-word-flex">
+                                <div class="bg-gray-100 px-3 py-2 border-round-xl">
+                                  <p class="font-medium">{{ us.fullName }}</p>
+                                  <p class=" text-black-alpha-60">{{ p.post.commentBody[j] }} </p>
+                                </div>
+                                <p class="text-black-alpha-60 text-xs mt-1 ml-3">
+                                  {{ p.post.createdAtComment[j] | timeAgo }} </p>
+                              </div>
+                            </div>
+                            <div *ngIf="myId == p.post.userComment[j].id || myId == p.post.createdBy">
+                              <div class="relative">
+                                <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100"
+                                  pStyleClass="@next" enterClass="hidden" leaveToClass="hidden"
+                                  [hideOnOutsideClick]="true">
+                                  <div
+                                    class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                                    <i class="fa-solid fa-ellipsis text-xl"></i>
+                                  </div>
+                                </div>
+                                <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden z-2">
+                                  <ul class="list-none p-0 m-0">
+                                    <li *ngIf="myId == p.post.userComment[j].id">
+                                      <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showEditComment(p.post.commentId[j], i, j)">
+                                        edit comment
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showPopUpDeleteComment(p.post.commentId[j], i, j)">
+                                        delete comment
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div *ngIf="j == indexComment">
+                            <div class="flex mt-3">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="w-full">
+                                <form [formGroup]="updateCommentForm" class="card w-full">
+                                  <div class="field">
+                                    <input formControlName="commentBody" pInputText
+                                      class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text">
+                                    <p class="text-xs text-black-alpha-60">Press Enter to Save Edit.
+                                    </p>
+                                  </div>
+                                  <div class="hidden">
+                                    <button [disabled]="updateCommentForm.invalid" type="submit"
+                                      (click)="updateComment(p.post.id, p.post.commentId[j], j, i)"></button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </ng-container>
+                        <div routerLink="/homes/details/{{p.post.id}}"
+                          class="mt-2 cursor-pointer w-full text-right font-medium text-black-alpha-60 hover:underline hover:text-black-alpha-50">
+                          <p>Show all comments</p>
+                        </div>
+
+                        <div class="flex mt-3">
+                          <div class="max-w-max mr-3">
+                            <div class="w-2rem h-2rem border-circle overflow-hidden">
+                              <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile">
+                              </div>
+                              <ng-template #isProfile>
+                                <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                              <ng-template #isNotProfile>
+                                <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <div class="w-full">
+                            <form [formGroup]="commentForm" class="card w-full">
+                              <div class="field">
+                                <input formControlName="commentBody" pInputText
+                                  class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text"
+                                  placeholder="write comment...">
+                                <p class="text-xs text-black-alpha-60">Press Enter to Send.
+                                </p>
+                              </div>
+                              <div class="hidden">
+                                <button [disabled]="commentForm.invalid" type="submit"
+                                  (click)="insertComment(p.post.id, i)"></button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </p-card>
+          </ng-container>
+
+          <ng-container *ngIf="type == 'bookmarks'">
+            <p-card infinite-scroll (scrolled)="onScrollLike()">
+              <p-tabMenu [model]="items" [activeItem]="items[0]"></p-tabMenu>
+
+              <ng-container *ngFor="let p of postBookmark; index as i">
+                <div class="md:mx-5 h-max">
+                  <div class="flex align-items-center mb-3 mt-7 relative z-1">
+                    <div class="max-w-max mr-3">
+                      <div class="w-3rem h-3rem border-circle overflow-hidden">
+                        <p-image [preview]="true" *ngIf="p.post.user.file" src="{{urlFile}}{{p.post.user.file.id}}"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                        <p-image [preview]="true" *ngIf="!p.post.user.file" src="../../../../assets/logos/user.jpg"
+                          alt="profile image" imageClass="w-3rem h-3rem"></p-image>
+                      </div>
+                    </div>
+                    <div class="w-full">
+                      <h3>{{ p.post.user.fullName }}</h3>
+                      <p class="text-black-alpha-60 text-xs mt-1">
+                        {{ p.post.createdAt | timeAgo }} </p>
+                    </div>
+                    <div *ngIf="p.post.user.company"
+                      class="hidden sm:block min-w-max mr-3 bg-green-100 border-round-xl">
+                      <h4 class="mx-3 my-1 text-green-500">{{ p.post.user.company }}</h4>
+                    </div>
+
+                    <div *ngIf="p.post.postType.postTypeName == 'Premium'"
+                      class="border-circle bg-orange-400 px-2 icon-box flex align-items-center justify-content-center">
+                      <i class="fa-regular fa-gem icon text-2xl"></i>
+                    </div>
+
+                    <div
+                      *ngIf="(p.post.postType.postTypeName != 'Premium') || (p.post.postType.postTypeName == 'Premium' && myStatusSubscribe)"
+                      class="relative">
+                      <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100" pStyleClass="@next"
+                        enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true">
+                        <div
+                          class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <i class="fa-solid fa-ellipsis text-xl"></i>
+                        </div>
+                      </div>
+                      <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden">
+                        <ul class="list-none p-0 m-0">
+                          <li>
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              routerLink="/homes/details/{{p.post.id}}">
+                              show detail
+                            </a>
+                          </li>
+                          <li *ngIf="myId == p.post.user.id">
+                            <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="postEditDialog(p.post.id, i)">
+                              edit post
+                            </a>
+                          </li>
+                          <li *ngIf="myId == p.post.user.id">
+                            <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                              (click)="showPopUpDelete(p.post.id, i)">
+                              delete post
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="relative">
+                    <div *ngIf="p.post.postType.postTypeName == 'Premium' && !myStatusSubscribe"
+                      pTooltip="disabled, premium first" class="cursor-pointer absolute w-full h-full bg-black-alpha-20 blur hover:bg-black-alpha-30
+                      flex justify-content-center align-items-center">
+                      <div class="text-center text-white">
+                        <i class="fa-solid fa-lock text-5xl"></i>
+                        <h2 class="mt-2">Locked</h2>
+                        <h2 class="text-white text-center w-full">Premium Only</h2>
+                      </div>
+                    </div>
+
+                    <p-card styleClass="content-box">
+                      <h3 class="text-justify">{{p.post.title}}
+                      </h3>
+                      <p class="text-black-alpha-60 mt-3 text-justify">
+                        {{p.post.contents }}
+                      </p>
+                    </p-card>
+
+                    <div *ngIf="p.post.fileId" class="flex w-full column-gap-1 cursor-pointer">
+                      <ng-container *ngFor="let pa of p.post.fileId;index as j">
+                        <ng-container *ngIf="p.post.fileId.length == 1">
+                          <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image">
+                        </ng-container>
+                        <ng-container *ngIf="p.post.fileId.length == 2">
+                          <div
+                            class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem bg-black-alpha-30 overflow-hidden">
+                            <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                              class="w-auto">
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="p.post.fileId.length > 2">
+                          <ng-container *ngIf="j == 0">
+                            <div
+                              class="w-6 flex justify-content-center align-content-center h-20rem sm:h-30rem  overflow-hidden pb-1">
+                              <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                                class="w-auto">
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+
+                      <ng-container *ngIf="p.post.fileId.length > 2">
+                        <div class="flex w-6 flex-wrap">
+                          <ng-container *ngFor="let pa of p.post.fileId;index as j">
+                            <ng-container *ngIf="j == 1">
+                              <div
+                                class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image"
+                                  class="h-auto">
+                              </div>
+                            </ng-container>
+                            <ng-container *ngIf="p.post.fileId.length == 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1">
+                                  <img (click)="imageClick(i, j)" src="{{urlFile}}{{ p.post.fileId[j] }}"
+                                    alt="post image" class="h-auto">
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="p.post.fileId.length > 3">
+                              <ng-container *ngIf="j == 2">
+                                <div
+                                  class="w-full flex justify-content-center align-content-center h-10rem sm:h-15rem overflow-hidden pb-1 relative">
+                                  <img src="{{urlFile}}{{ p.post.fileId[j] }}" alt="post image" class="h-auto">
+                                  <div (click)="imageClick(i, j)"
+                                    class="absolute w-full h-10rem sm:h-15rem bg-black-alpha-90 opacity-70 flex justify-content-center align-items-center img-cover">
+                                    <h1 class="text-white">
+                                      {{p.post.fileId.length -3}} +</h1>
+                                  </div>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </div>
+
+                    <p-card *ngIf="p.post.titlePoll" styleClass="pooling-content">
+                      <h3 class="text-justify">{{p.post.titlePoll}}</h3>
+
+                      <ng-container *ngFor="let po of p.post.pollContents; index as j">
+
+                        <div *ngIf="!p.post.choosenPolling" class="mt-3 body-color hover:bg-gray-100">
+                          <div class="flex align-items-center cursor-pointer py-3"
+                            (click)="choosePollOption(p.post.pollId[j], i , j)">
+                            <p class="text-center text-lg main-text w-full">{{po}}</p>
+                          </div>
+                        </div>
+
+
+                        <ng-container *ngIf="p.post.choosenPolling">
+                          <div *ngIf="p.post.pollId[j] != p.post.choosenPolling"
+                            class="mt-3 py-3 body-color cursor-pointer" pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg main-text w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 text-black-alpha-60">{{p.post.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+
+                          <div *ngIf="p.post.pollId[j] == p.post.choosenPolling"
+                            class="mt-3 py-3 main-color text-white cursor-pointer" pTooltip="you have voted">
+                            <div class="flex align-items-center">
+                              <p class="text-center text-lg  w-full">{{po}}</p>
+                              <p class="min-w-max mr-3 ">{{p.post.totalPoll[j]}} votes</p>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                      <div class="flex mt-5 align-items-center text-black-alpha-60">
+                        <i class="fa-solid fa-check-to-slot text-2xl mr-2 cursor-pointer"></i>
+                        <p class="w-full">{{p.post.totalVote}} votes</p>
+                      </div>
+
+                    </p-card>
+
+                    <div class="flex flex-wrap mt-5 align-items-center text-black-alpha-60 ">
+                      <!-- <div class="flex align-items-center">
+                        <div
+                          class="flex-order-0 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2"
+                          (click)="actLikePostLike(p.post.likeId,i)">
+                          <i class="fa-solid fa-heart text-red-500 text-2xl mr-2"></i>
+                          <p class="min-w-max">{{ p.post.countOfLike }} <span class="hidden sm:inline">likes</span>
+                          </p>
+                        </div>
+                      </div> -->
+
+                      <div class="flex-order-2 flex align-items-center cursor-pointer flex-grow-1 justify-content-end"
+                        (click)="actBookmarkPostBookmark(p.post.bookmarkId, i)">
+                        <div
+                          class="hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                          <div>
+                          </div>
+                          <i class="fa-solid fa-bookmark text-2xl mr-2 main-text"></i>
+                        </div>
+                      </div>
+
+                      <div pStyleClass="@next" enterClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true"
+                        enterActiveClass="scalein" leaveActiveClass="fadeout"
+                        class="flex-order-1 flex align-items-center cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                        <div class="ml-1 flex align-items-center">
+                          <i class="fa-regular fa-message text-2xl mr-2"></i>
+                          <p class="">{{ p.post.countOfComment }} <span class="hidden sm:inline">comments</span></p>
+                        </div>
+                      </div>
+
+                      <div class="flex-order-3 w-full mt-2 hidden">
+                        <ng-container *ngFor="let us of p.post.userComment;index as j">
+                          <div *ngIf="j != indexComment" class="flex mt-3 justify-content-between">
+                            <div class="flex">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="card-word-flex">
+                                <div class="bg-gray-100 px-3 py-2 border-round-xl">
+                                  <p class="font-medium">{{ us.fullName }}</p>
+                                  <p class=" text-black-alpha-60">{{ p.post.commentBody[j] }} </p>
+                                </div>
+                                <p class="text-black-alpha-60 text-xs mt-1 ml-3">
+                                  {{ p.post.createdAtComment[j] | timeAgo }} </p>
+                              </div>
+                            </div>
+                            <div *ngIf="myId == p.post.userComment[j].id || myId == p.post.createdBy">
+                              <div class="relative">
+                                <div class="flex align-items-center text-900 cursor-pointer hover:bg-gray-100"
+                                  pStyleClass="@next" enterClass="hidden" leaveToClass="hidden"
+                                  [hideOnOutsideClick]="true">
+                                  <div
+                                    class=" cursor-pointer hover:text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 px-3 py-2">
+                                    <i class="fa-solid fa-ellipsis text-xl"></i>
+                                  </div>
+                                </div>
+                                <div class="absolute right-0 py-1 shadow-2 w-12rem bg-white hidden z-2">
+                                  <ul class="list-none p-0 m-0">
+                                    <li *ngIf="myId == p.post.userComment[j].id">
+                                      <a class="block px-3 pt-2 pb-3 no-underline text-black-alpha-60 hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showEditComment(p.post.commentId[j], i, j)">
+                                        edit comment
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a class="text-red-500 block px-3 pt-2 pb-3 no-underline hover:bg-gray-100 transition-all transition-duration-200 cursor-pointer"
+                                        (click)="showPopUpDeleteComment(p.post.commentId[j], i, j)">
+                                        delete comment
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div *ngIf="j == indexComment">
+                            <div class="flex mt-3">
+                              <div class="max-w-max mr-3">
+                                <p-image [preview]="true" *ngIf="us.file" src="{{urlFile}}{{us.file.id}}"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                                <p-image [preview]="true" *ngIf="!us.file" src="../../../../assets/logos/user.jpg"
+                                  alt="profile image" imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </div>
+                              <div class="w-full">
+                                <form [formGroup]="updateCommentForm" class="card w-full">
+                                  <div class="field">
+                                    <input formControlName="commentBody" pInputText
+                                      class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text">
+                                    <p class="text-xs text-black-alpha-60">Press Enter to Save Edit.
+                                    </p>
+                                  </div>
+                                  <div class="hidden">
+                                    <button [disabled]="updateCommentForm.invalid" type="submit"
+                                      (click)="updateComment(p.post.id, p.post.commentId[j], j, i)"></button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </ng-container>
+                        <div routerLink="/homes/details/{{p.post.id}}"
+                          class="mt-2 cursor-pointer w-full text-right font-medium text-black-alpha-60 hover:underline hover:text-black-alpha-50">
+                          <p>Show all comments</p>
+                        </div>
+
+
+                        <div class="flex mt-3">
+                          <div class="max-w-max mr-3">
+                            <div class="w-2rem h-2rem border-circle overflow-hidden">
+                              <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile">
+                              </div>
+                              <ng-template #isProfile>
+                                <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                              <ng-template #isNotProfile>
+                                <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                                  imageClass="w-2rem h-2rem border-circle"></p-image>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <div class="w-full">
+                            <form [formGroup]="commentForm" class="card w-full">
+                              <div class="field">
+                                <input formControlName="commentBody" pInputText
+                                  class="text-lg w-full h-2rem border-round-2xl bg-gray-100" type="text"
+                                  placeholder="write comment...">
+                                <p class="text-xs text-black-alpha-60">Press Enter to Send.
+                                </p>
+                              </div>
+                              <div class="hidden">
+                                <button [disabled]="commentForm.invalid" type="submit"
+                                  (click)="insertComment(p.post.id, i)"></button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </p-card>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [(visible)]="display" [breakpoints]="{'960px': '75vw', '640px': '100vw'}">
+  <ng-template pTemplate="header">
+    <ng-container *ngIf="postType == 'premium'">
+      <div class="border-circle bg-orange-300 icon-box flex align-items-center justify-content-center">
+        <i class="fa-regular fa-gem icon text-xl"></i>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="postType == 'regular'">
+      <div class="border-circle main-color icon-box flex align-items-center justify-content-center">
+        <i class="fa-regular fa-note-sticky icon text-xl"></i>
+      </div>
+    </ng-container>
+    <h3 class="capitalize">{{postType}} Post</h3>
+  </ng-template>
+  <div class="grid bg-white border-round-xl w-full lg:w-30rem">
+    <div class="col-12">
+      <div class="flex mb-3">
+        <div class="max-w-max mr-3">
+          <div class="w-3rem h-3rem border-circle overflow-hidden">
+            <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile"></div>
+            <ng-template #isProfile>
+              <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                imageClass="w-3rem h-3rem border-circle"></p-image>
+            </ng-template>
+            <ng-template #isNotProfile>
+              <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                imageClass="w-3rem h-3rem border-circle"></p-image>
+            </ng-template>
+          </div>
+        </div>
+        <div class="w-full">
+          <h3>{{ myFullName }}</h3>
+          <div *ngIf="myCompany != ''" class=" max-w-max mr-3 bg-green-100 border-round-xl">
+            <h4 class="mx-3 my-1 text-green-500">{{ myCompany }}</h4>
+          </div>
+        </div>
+      </div>
+      <form class="card" [formGroup]="postForm">
+        <div class="field">
+          <input pInputText id="title" name="title" type="text" class="w-full p-inputtext-sm" formControlName="title"
+            placeholder="title" required maxlength="50">
+          <small *ngIf="postForm.controls['title'].touched && postForm.controls['title'].errors?.['required']"
+            id="title-help" class="p-error block">Please enter your title.</small>
+        </div>
+        <div class="field">
+          <textarea [rows]="5" [cols]="30" pInputTextarea [autoResize]="true" name="contents" type="text"
+            formControlName="contents" class="w-full h-auto text-sm" placeholder="contents" required></textarea>
+          <small *ngIf="postForm.controls['contents'].touched && postForm.controls['contents'].errors?.['required']"
+            id="contents-help" class="p-error block">Please enter your contents.</small>
+        </div>
+        <div class="field">
+          <label for="file">Photo</label>
+          <p-fileUpload #uploadComponent id="file" name="file" accept="image/*" (uploadHandler)="fileUpload($event)"
+            [auto]=true [customUpload]="true" chooseLabel="Choose" [multiple]="true">
+          </p-fileUpload>
+        </div>
+        <button pButton [loading]="loadingPost" [disabled]="postForm.invalid" type="submit" (click)="postInsert()"
+          class="main-color w-full mt-3" label="SUBMIT"></button>
+      </form>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [(visible)]="displayEdit" [breakpoints]="{'960px': '75vw', '640px': '100vw'}">
+  <ng-template pTemplate="header">
+    <div class="border-circle main-color icon-box flex align-items-center justify-content-center">
+      <i class="fa-solid fa-pen icon text-xl"></i>
+    </div>
+    <h3 class="capitalize">Edit Post</h3>
+  </ng-template>
+  <div class="grid bg-white border-round-xl w-full lg:w-30rem">
+    <div class="col-12">
+      <div class="flex mb-3">
+        <div class="max-w-max mr-3">
+          <div class="w-3rem h-3rem border-circle overflow-hidden">
+            <div *ngIf="(myProfile == 'null' || myProfile == ''); then isNotProfile else isProfile"></div>
+            <ng-template #isProfile>
+              <p-image [preview]="true" src="{{urlFile}}{{myProfile}}" alt="profile image"
+                imageClass="w-3rem h-3rem border-circle"></p-image>
+            </ng-template>
+            <ng-template #isNotProfile>
+              <p-image [preview]="true" src="../../../../assets/logos/user.jpg" alt="profile image"
+                imageClass="w-3rem h-3rem border-circle"></p-image>
+            </ng-template>
+          </div>
+        </div>
+        <div class="w-full">
+          <h3>{{ myFullName }}</h3>
+          <div *ngIf="myCompany != ''" class=" max-w-max mr-3 bg-green-100 border-round-xl">
+            <h4 class="mx-3 my-1 text-green-500">{{ myCompany }}</h4>
+          </div>
+        </div>
+      </div>
+      <form class="card" [formGroup]="updatePostForm">
+        <div class="field">
+          <input pInputText id="title" name="title" type="text" class="w-full p-inputtext-sm" formControlName="title"
+            placeholder="title" required>
+        </div>
+        <div class="field">
+          <textarea [rows]="5" [cols]="30" pInputTextarea [autoResize]="true" name="contents" type="text"
+            formControlName="contents" class="w-full h-auto text-sm" placeholder="contents"></textarea>
+        </div>
+        <button pButton [loading]="loadingPost" [disabled]="updatePostForm.invalid" type="submit" (click)="postUpdate()"
+          class="main-color w-full mt-3" label="SUBMIT"></button>
+      </form>
+    </div>
+  </div>
+</p-dialog>
+
+<p-confirmDialog [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [style]="{width: '50vw'}"
+  rejectButtonStyleClass="p-button-outlined" acceptButtonStyleClass="p-button-danger">
+</p-confirmDialog>
+
+
+<p-galleria [value]="images" [(visible)]="displayGalleria" [responsiveOptions]="responsiveOptions"
+  [containerStyle]="{'max-width': '850px'}" [numVisible]="7" [circular]="true" [fullScreen]="true"
+  [showItemNavigators]="true" [showThumbnails]="false" [baseZIndex]="100000" [activeIndex]="activeIndex">
+  <ng-template pTemplate="item" let-item>
+    <img src="{{urlFile}}{{item}}" style="width: 100%; display: block;" />
+  </ng-template>
+  <ng-template pTemplate="thumbnail" let-item>
+    <div class="grid grid-nogutter justify-content-center">
+      <img src="{{urlFile}}{{item}}" style="display: block;" />
+    </div>
+  </ng-template>
+</p-galleria>

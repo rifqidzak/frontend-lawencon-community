@@ -1,0 +1,34 @@
+<div class="w-full body-color flex justify-content-center">
+    <div class="w-full lg:w-10 container mt-3">
+        <p routerLink="/articles/members"
+            class="mb-4 ml-2 lg:ml-0 font-medium hover:text-black-alpha-60 hover:underline cursor-pointer">
+            <i class="fa-solid fa-angle-left mr-2 text-sm"> </i>
+            See all article
+        </p>
+        <div class="w-full">
+            <ng-container *ngIf="article.file">
+                <p-image *ngIf="article.file.files" [preview]="true" src="{{urlFile}}{{ article.file.id}}"
+                    alt="article img" styleClass="w-full">
+                </p-image>
+                <p-image *ngIf="!article.file.files" [preview]="true" src="../../../../assets/images/article.jpg"
+                    alt="article img" styleClass="w-full">
+                </p-image>
+            </ng-container>
+        </div>
+        <p-card>
+            <div class="md:mx-5 mb-3">
+                <div class="text-right">
+                    <p class=" mb-3 text-black-alpha-60">
+                        {{ article.createdAt | timeAgo }}
+                    </p>
+                </div>
+                <div class="w-full">
+                    <h2>{{article.title}}</h2>
+                    <p class="text-black-alpha-60  mt-3 text-justify">
+                        {{article.contents}}
+                    </p>
+                </div>
+            </div>
+        </p-card>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="w-full min-h-screen body-color flex md:align-items-center justify-content-center">
+    <div class="grid bg-white border-round-xl lg:w-9 md:w-12 sm:w-10 w-12 container">
+        <div class="col-12 md:col-3 bg-login flex align-items-center justify-content-center min-h-30rem">
+            <div class="text-center text-white mb-3 md:mb-0">
+                <img src="../../../assets/logos/brand.png" class="login-brand mb-3 md:mt-0 mt-3"
+                    alt="lawencon international community">
+                <h2>LAWENCON</h2>
+                <h5>INTERNATIONAL</h5>
+                <H5>COMMUNITY</H5>
+            </div>
+        </div>
+        <div class="col-12 md:col-9 md:px-6 pl-4 pr-2 py-6">
+            <div class=" flex align-items-center mb-5">
+                <div class="border-circle main-color icon-box flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-arrow-up-from-bracket icon"></i>
+                </div>
+                <h2 class=" ml-3">
+                    Sign Up
+                </h2>
+            </div>
+            <form [formGroup]="registerForm" class="card">
+                <div class="formgrid grid w-full">
+                    <div class="field col-12 md:col-6">
+                        <label for="fullName">Full Name <span class="text-red-500">*</span></label>
+                        <input pInputText id="fullName" formControlName="fullName" name="fullName" type="text"
+                            class="w-full p-inputtext-sm" required maxlength="30">
+                        <small
+                            *ngIf="registerForm.controls['fullName'].touched && registerForm.controls['fullName'].errors?.['required']"
+                            id="fullName-help" class="p-error block">Please enter your name.</small>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="email">Email Address <span class="text-red-500">*</span></label>
+                        <input pInputText id="email" formControlName="email" name="email" type="email"
+                            class="w-full p-inputtext-sm" required maxlength="50">
+                        <small
+                            *ngIf="registerForm.controls['email'].touched && registerForm.controls['email'].errors?.['required']"
+                            id="email-help" class="p-error block">Please enter your email.</small>
+                        <small
+                            *ngIf="registerForm.controls['email'].errors?.['email'] && registerForm.controls['email'].dirty"
+                            id="email-help" class="p-error block">Your email format is wrong.</small>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="pass">Password <span class="text-red-500">*</span></label>
+                        <p-password id="pass" name="pass" formControlName="pass" styleClass="w-full p-inputtext-sm"
+                            inputStyleClass="w-full p-inputtext-sm" [toggleMask]="true"></p-password>
+                        <small
+                            *ngIf="registerForm.controls['pass'].touched && registerForm.controls['pass'].errors?.['required']"
+                            id="pass-help" class="p-error block">Please enter your password.</small>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="company">Company <span class="text-red-500">*</span></label>
+                        <input pInputText id="company" formControlName="company" name="company" type="text"
+                            class="w-full p-inputtext-sm" required maxlength="100">
+                        <small
+                            *ngIf="registerForm.controls['company'].touched && registerForm.controls['company'].errors?.['required']"
+                            id="company-help" class="p-error block">Please enter your company.</small>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="industryName">Industry</label>
+                        <p-dropdown [options]="industries" styleClass="w-full" optionLabel="industryName"
+                            optionValue="id" name="industry" id="industryName" formControlName="industryId"
+                            placeholder="Select an Industry">
+                        </p-dropdown>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="positionName">Position</label>
+                        <p-dropdown [options]="positions" styleClass="w-full" optionLabel="positionName"
+                            optionValue="id" name="position" id="positionName" formControlName="positionId"
+                            placeholder="Select an Position">
+                        </p-dropdown>
+
+                    </div>
+                    <div class="field col-12">
+                        <p class="text-center mt-4 mb-2">Have an Account? <b routerLink="/login/member"
+                                class=" cursor-pointer main-text sign-up-btn">Sign
+                                In</b></p>
+                        <button pButton [disabled]="registerForm.invalid" (click)="getVerificationCode()" type="submit"
+                            class="main-color mt-3 w-full md:max-w-max" label="SIGN UP"></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="display">
+    <div class="grid bg-white border-round-xl max-w-30rem mb-5">
+        <ng-template pTemplate="header">
+            <h3>Header Content</h3>
+        </ng-template>
+        <div class="col-12 md:px-6 px-3">
+            <div class=" flex align-items-center justify-content-center mb-5">
+                <div class="border-circle main-color icon-box flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-code icon"></i>
+                </div>
+                <h2 class=" ml-3">
+                    Verification Code
+                </h2>
+            </div>
+            <form class="card" [formGroup]="verifCodeForm">
+                <div class="field">
+                    <label for="code">Your Code</label>
+                    <p-password id="code" name="code" formControlName="code" styleClass="w-full p-inputtext-sm"
+                        inputStyleClass="w-full p-inputtext-sm" [toggleMask]="true" [feedback]="false"></p-password>
+                    <small
+                        *ngIf="verifCodeForm.controls['code'].touched && verifCodeForm.controls['code'].errors?.['required']"
+                        id="code-help" class="p-error block">Please enter your verification code.</small>
+                </div>
+                <p>verification code has been sent to your email,
+                    please check your email</p>
+                <button pButton [disabled]="verifCodeForm.invalid" type="submit" (click)="verifCode()"
+                    class="main-color w-full mt-3" label="SUBMIT"></button>
+            </form>
+        </div>
+    </div>
+</p-dialog>
